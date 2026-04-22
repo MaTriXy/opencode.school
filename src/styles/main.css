@@ -87,17 +87,46 @@
   .prose :is(h2, h3, h4, h5, h6):hover .heading-anchor::after {
     visibility: visible;
   }
+}
 
-  /* Ensure prose code blocks and inline code stay stone-toned in dark mode */
-  .dark .prose pre {
-    background-color: theme(--color-stone-800);
-    color: theme(--color-stone-300);
-  }
+/*
+  Theme-framed code blocks.
 
-  .dark .prose code {
-    background-color: theme(--color-stone-800);
-    color: theme(--color-stone-300);
-  }
+  A 2px theme-colored border plus a lightly theme-tinted background.
+  Inspired by the agent-prompt card but quieter — no box shadow, no
+  heavy left border — so code blocks read as a subtle highlight rather
+  than a callout.
+
+  Vesper bakes per-token `style="color:#..."` into each span at build
+  time, so we neutralize those with `color: inherit !important` on the
+  spans and set a single monochrome ink color on the block.
+
+  These rules live outside `@layer base` because Tailwind Typography
+  emits its prose `pre` / `code` styles inside `@layer utilities`, which
+  wins against any layered rule regardless of specificity. Unlayered
+  declarations beat layered ones in the cascade.
+*/
+.prose pre.astro-code {
+  /* !important overrides Shiki's inline background and color on <pre>. */
+  border: 2px solid var(--theme-solid);
+  background: color-mix(in srgb, var(--theme-soft-bg) 40%, white) !important;
+  color: theme(--color-stone-800) !important;
+}
+
+.prose pre.astro-code span {
+  color: inherit !important;
+}
+
+.dark .prose pre.astro-code {
+  border: 2px solid color-mix(in srgb, var(--theme-link-dark) 60%, transparent);
+  background: theme(--color-stone-900) !important;
+  color: theme(--color-stone-300) !important;
+}
+
+/* Inline code inside prose — stone-toned in dark mode for readability */
+.dark .prose :not(pre) > code {
+  background-color: theme(--color-stone-800);
+  color: theme(--color-stone-300);
 }
 
 @keyframes spin-slow {
